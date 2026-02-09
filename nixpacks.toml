@@ -1,8 +1,0 @@
-[phases.build]
-cmds = ["cd telegram-bot && npm install"]
-
-[phases.setup]
-nixPkgs = ["nodejs_20", "npm-9_x"]
-
-[start]
-cmd = "cd telegram-bot && npm start"
