@@ -11,53 +11,26 @@
 6. Click **"Deploy"**
 7. Done! Bot will be live at @ProphecyOracleBot
 
----
-
-## Option 2: GitHub Actions (Automatic Deploys)
-
-### Setup Steps:
-
-1. Go to your GitHub repo: https://github.com/Peni-Ghost/prophecy
-2. Click **Settings** → **Secrets and variables** → **Actions**
-3. Click **"New repository secret"**
-4. Add these secrets:
-
-| Secret Name | Value |
-|-------------|-------|
-| `RAILWAY_TOKEN` | `4ef46f2a-ff62-4c77-8031-bcad5b9d8f26` |
-| `TELEGRAM_BOT_TOKEN` | `7936318809:AAG-vXylRjUb-3zhC4IkV4ltCndGh0Doghg` |
-
-5. Go to **Actions** tab in your repo
-6. Click **"Deploy Telegram Bot to Railway"**
-7. Click **"Run workflow"**
-8. Done!
+> ⚠️ **Note:** The `nixpacks.toml` file is already configured to install Node.js in the telegram-bot directory.
 
 ---
 
-## Option 3: Railway CLI (Local)
+## Option 2: Render (Alternative)
 
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login (interactive)
-railway login
-
-# Create project
-railway init --name prophecy-bot
-
-# Set environment variable
-railway variables set TELEGRAM_BOT_TOKEN=7936318809:AAG-vXylRjUb-3zhC4IkV4ltCndGh0Doghg
-
-# Deploy
-cd telegram-bot
-railway up
-```
+1. Go to [dashboard.render.com](https://dashboard.render.com)
+2. Click **"New +"** → **"Web Service"**
+3. Connect GitHub repo `Peni-Ghost/prophecy`
+4. Settings:
+   - **Environment:** Node
+   - **Build Command:** `cd telegram-bot && npm install`
+   - **Start Command:** `cd telegram-bot && npm start`
+   - **Environment Variable:** `TELEGRAM_BOT_TOKEN=7936318809:AAG-vXylRjUb-3zhC4IkV4ltCndGh0Doghg`
+5. Deploy
 
 ---
 
-## 🎯 Recommended: Option 1 (Dashboard)
+## 🎯 Recommended: Option 1 (Railway Dashboard)
 
-It's the fastest and doesn't require any CLI setup.
+It's the fastest and handles Node.js automatically via `nixpacks.toml`.
 
 **Your bot will be live at:** [@ProphecyOracleBot](https://t.me/ProphecyOracleBot)
