@@ -4,65 +4,55 @@ Train a simple MLP model for price prediction.
 Generates weights compatible with Cauldron/Frostbite.
 """
 
-import numpy as np
 import json
 import struct
+import random
 
 def generate_mlp_weights(input_size=10, hidden_size=16, output_size=1):
     """Generate random MLP weights for demo purposes."""
-    np.random.seed(42)
+    random.seed(42)
     
-    # Layer 1: input -> hidden
-    W1 = np.random.randn(input_size, hidden_size).astype(np.float32) * 0.1
-    b1 = np.zeros(hidden_size, dtype=np.float32)
+    # Generate random weights as flat lists
+    W1 = [random.uniform(-0.1, 0.1) for _ in range(input_size * hidden_size)]
+    b1 = [0.0] * hidden_size
     
-    # Layer 2: hidden -> output
-    W2 = np.random.randn(hidden_size, output_size).astype(np.float32) * 0.1
-    b2 = np.zeros(output_size, dtype=np.float32)
+    W2 = [random.uniform(-0.1, 0.1) for _ in range(hidden_size * output_size)]
+    b2 = [0.0] * output_size
     
     return {
         'W1': W1,
         'b1': b1,
         'W2': W2,
-        'b2': b2
+        'b2': b2,
+        'shapes': {
+            'W1': [input_size, hidden_size],
+            'b1': [hidden_size],
+            'W2': [hidden_size, output_size],
+            'b2': [output_size]
+        }
     }
 
-def pack_weights_binary(weights, output_file='weights.bin'):
+def pack_weights_binary(weights, output_file='models/weights.bin'):
     """Pack weights into binary format for Cauldron."""
     with open(output_file, 'wb') as f:
-        # Write layer 1 weights
-        f.write(weights['W1'].tobytes())
-        f.write(weights['b1'].tobytes())
-        # Write layer 2 weights
-        f.write(weights['W2'].tobytes())
-        f.write(weights['b2'].tobytes())
+        # Write all weights as float32
+        for w in weights['W1']:
+            f.write(struct.pack('f', w))
+        for b in weights['b1']:
+            f.write(struct.pack('f', b))
+        for w in weights['W2']:
+            f.write(struct.pack('f', w))
+        for b in weights['b2']:
+            f.write(struct.pack('f', b))
     
     print(f"✅ Weights saved to {output_file}")
-    print(f"   W1: {weights['W1'].shape}")
-    print(f"   b1: {weights['b1'].shape}")
-    print(f"   W2: {weights['W2'].shape}")
-    print(f"   b2: {weights['b2'].shape}")
 
-def pack_weights_json(weights, output_file='weights.json'):
+def pack_weights_json(weights, output_file='models/weights.json'):
     """Pack weights into JSON format for inspection."""
-    weights_dict = {
-        'W1': weights['W1'].tolist(),
-        'b1': weights['b1'].tolist(),
-        'W2': weights['W2'].tolist(),
-        'b2': weights['b2'].tolist()
-    }
-    
     with open(output_file, 'w') as f:
-        json.dump(weights_dict, f, indent=2)
+        json.dump(weights, f, indent=2)
     
     print(f"✅ Weights JSON saved to {output_file}")
-
-def simulate_prediction(weights, input_data):
-    """Simulate a forward pass through the MLP."""
-    # Simple MLP forward pass
-    hidden = np.maximum(0, np.dot(input_data, weights['W1']) + weights['b1'])  # ReLU
-    output = np.dot(hidden, weights['W2']) + weights['b2']
-    return output
 
 if __name__ == '__main__':
     print("🔮 Prophecy Model Training")
@@ -75,13 +65,16 @@ if __name__ == '__main__':
     pack_weights_binary(weights, 'models/weights.bin')
     pack_weights_json(weights, 'models/weights.json')
     
-    # Test prediction
-    test_input = np.random.randn(10).astype(np.float32)
-    prediction = simulate_prediction(weights, test_input)
+    # Calculate total bytes
+    total_floats = len(weights['W1']) + len(weights['b1']) + len(weights['W2']) + len(weights['b2'])
+    total_bytes = total_floats * 4  # float32 = 4 bytes
     
-    print(f"\n🧪 Test Prediction:")
-    print(f"   Input shape: {test_input.shape}")
-    print(f"   Output: {prediction[0]:.6f}")
+    print(f"\n📊 Model Stats:")
+    print(f"   W1: {weights['shapes']['W1']}")
+    print(f"   b1: {weights['shapes']['b1']}")
+    print(f"   W2: {weights['shapes']['W2']}")
+    print(f"   b2: {weights['shapes']['b2']}")
+    print(f"   Total parameters: {total_floats}")
+    print(f"   Total bytes: {total_bytes}")
     
     print("\n✨ Ready for Cauldron upload!")
-    print("   Run: cauldron upload --file models/weights.bin --accounts frostbite-accounts.toml")
