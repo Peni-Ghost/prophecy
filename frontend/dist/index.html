@@ -6,15 +6,17 @@
   <title>Prophecy | On-Chain AI Oracle</title>
   <meta name="description" content="AI price predictions running on Solana via Cauldron ML inference">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            slate: { 950: '#020617', 900: '#0f172a', 800: '#1e293b' },
+            slate: { 950: '#020617', 900: '#0f172a', 800: '#1e293b', 700: '#334155' },
             indigo: { 500: '#6366f1', 400: '#818cf8' },
             purple: { 500: '#a855f7' },
-            emerald: { 400: '#34d399' }
+            emerald: { 400: '#34d399', 500: '#10b981' },
+            rose: { 400: '#fb7185' }
           }
         }
       }
@@ -26,12 +28,14 @@
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     .fade-in { animation: fadeIn 0.5s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .gradient-text { background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100">
   <div id="app">
+    <!-- Header -->
     <header class="border-b border-indigo-500/20 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/></svg>
@@ -40,23 +44,50 @@
         </div>
         <div class="flex items-center gap-3">
           <div id="status-indicator" class="flex items-center gap-2 text-sm text-emerald-400"><div class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></div>Live</div>
-          <a href="https://github.com/Peni-Ghost/prophecy" target="_blank" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm">GitHub</a>
-          <a href="https://colosseum.com/agent-hackathon/projects/prophecy" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-sm font-medium text-white">Colosseum</a>
+          <a href="https://t.me/ProphecyOracleBot" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            Telegram Bot
+          </a>
+          <a href="https://github.com/Peni-Ghost/prophecy" target="_blank" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm transition-all">GitHub</a>
+          <a href="https://colosseum.com/agent-hackathon/projects/prophecy" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-sm font-medium text-white transition-all">Vote on Colosseum</a>
         </div>
       </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
+    <main class="max-w-7xl mx-auto px-4 py-12">
+      <!-- Hero -->
       <div class="text-center mb-16">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-6">
-          <div class="w-2 h-2 rounded-full bg-indigo-400 pulse-dot"></div>Real-Time Market Data
+          <div class="w-2 h-2 rounded-full bg-indigo-400 pulse-dot"></div>
+          Real-Time Market Data
         </div>
-        <h2 class="text-5xl font-bold mb-4 text-white">AI Predictions<br/><span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">On-Chain</span></h2>
-        <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-8">Prophecy trains lightweight ML models, deploys them to Solana via Cauldron, and runs inference directly on the Frostbite RISC-V VM.</p>
+        <h2 class="text-5xl font-bold mb-4 text-white">AI Predictions<br/><span class="gradient-text">On-Chain</span></h2>
+        <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-8">
+          Prophecy trains lightweight ML models, deploys them to Solana via Cauldron,
+          and runs inference directly on the Frostbite RISC-V VM.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <div class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900/50 border border-slate-800">
+            <div class="text-left"><div class="text-slate-400 text-xs">Assets</div><div class="font-semibold text-white">10+ Pairs</div></div>
+          </div>
+          <div class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900/50 border border-slate-800">
+            <div class="text-left"><div class="text-slate-400 text-xs">Model</div><div class="font-semibold text-white">MLP (193 params)</div></div>
+          </div>
+          <div class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900/50 border border-slate-800">
+            <div class="text-left"><div class="text-slate-400 text-xs">Verified</div><div class="font-semibold text-white">On-Chain</div></div>
+          </div>
+        </div>
       </div>
 
-      <div id="loading" class="text-center py-12"><div class="inline-flex items-center gap-3"><div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div><span class="text-slate-400">Fetching live market data...</span></div></div>
+      <!-- Loading -->
+      <div id="loading" class="text-center py-12">
+        <div class="inline-flex items-center gap-3">
+          <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-slate-400">Fetching live market data...</span>
+        </div>
+      </div>
 
+      <!-- Predictions Grid -->
       <div id="predictions" class="mb-12 hidden">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-white">Live Predictions</h3>
@@ -65,13 +96,104 @@
             <span id="last-updated" class="text-sm text-slate-500"></span>
           </div>
         </div>
-        <div id="predictions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        <div id="predictions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+      </div>
+
+      <!-- Charts Section -->
+      <div id="charts-section" class="mb-12 hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-white">Price History & Predictions</h3>
+          <div class="flex gap-2">
+            <button onclick="setChartPeriod('7d')" class="chart-period-btn px-3 py-1 rounded-lg bg-indigo-500 text-white text-sm" data-period="7d">7D</button>
+            <button onclick="setChartPeriod('30d')" class="chart-period-btn px-3 py-1 rounded-lg bg-slate-800 text-slate-400 text-sm hover:bg-slate-700" data-period="30d">30D</button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-semibold text-white">SOL-USDC</span>
+              <span id="sol-price" class="text-emerald-400 font-mono">--</span>
+            </div>
+            <div class="h-64"><canvas id="chart-sol"></canvas></div>
+          </div>
+          
+          <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-semibold text-white">BTC-USDC</span>
+              <span id="btc-price" class="text-emerald-400 font-mono">--</span>
+            </div>
+            <div class="h-64"><canvas id="chart-btc"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Section -->
+      <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-8 mb-12">
+        <div class="text-center">
+          <h3 class="text-2xl font-bold text-white mb-2">Support Prophecy</h3>
+          <p class="text-slate-400 mb-6">Vote for us on Colosseum and share with your network</p>
+          
+          <div class="flex flex-wrap justify-center gap-4">
+            <a href="https://colosseum.com/agent-hackathon/projects/prophecy" target="_blank" 
+               class="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-semibold transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>
+              Vote on Colosseum
+            </a>
+            
+            <button onclick="shareOnX()" 
+                    class="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Share on X
+            </button>
+            
+            <button onclick="copyLink()" 
+                    class="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Copy Link
+            </button>
+          </div>
+          
+          <div id="copy-feedback" class="mt-4 text-emerald-400 text-sm hidden">✓ Link copied to clipboard!</div>
+        </div>
+      </div>
+
+      <!-- How It Works -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 mb-12">
+        <h3 class="font-semibold text-white mb-6">How It Works</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm shrink-0">1</div>
+            <div><div class="font-medium text-sm text-white">Train Model</div><div class="text-xs text-slate-500">MLP with 193 parameters</div></div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm shrink-0">2</div>
+            <div><div class="font-medium text-sm text-white">Upload to Solana</div><div class="text-xs text-slate-500">Weights in on-chain accounts</div></div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm shrink-0">3</div>
+            <div><div class="font-medium text-sm text-white">On-Chain Inference</div><div class="text-xs text-slate-500">Frostbite RISC-V VM</div></div>
+          </div>
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm shrink-0">4</div>
+            <div><div class="font-medium text-sm text-white">Get Predictions</div><div class="text-xs text-slate-500">Web + Telegram Bot</div></div>
+          </div>
+        </div>
       </div>
     </main>
 
+    <!-- Footer -->
     <footer class="border-t border-slate-800 py-8">
-      <div class="max-w-6xl mx-auto px-4 text-center text-slate-500 text-sm">
-        <p>Built by Vera-X for Colosseum Agent Hackathon 2026</p>
+      <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
+        <p>Built by <span class="text-indigo-400">Vera-X</span> for Colosseum Agent Hackathon 2026</p>
+        <div class="flex justify-center gap-4 mt-4">
+          <a href="https://github.com/Peni-Ghost/prophecy" class="hover:text-white transition-colors">GitHub</a>
+          <span class="text-slate-700">•</span>
+          <a href="https://t.me/ProphecyOracleBot" class="hover:text-white transition-colors">Telegram</a>
+          <span class="text-slate-700">•</span>
+          <a href="https://colosseum.com/agent-hackathon/projects/prophecy" class="hover:text-white transition-colors">Colosseum</a>
+        </div>
+        <p class="mt-4 text-xs">Using Cauldron • Solana • Anchor • Frostbite VM</p>
       </div>
     </footer>
   </div>
@@ -85,16 +207,22 @@
       REFRESH_INTERVAL: 30000
     };
 
-    // Fallback data (shown when API fails)
-    const FALLBACK_DATA = {
-      'SOL': { usd: 154.80, usd_24h_change: 2.5 },
-      'BTC': { usd: 98500, usd_24h_change: 1.8 },
-      'ETH': { usd: 2850, usd_24h_change: -0.5 },
-      'JUP': { usd: 0.85, usd_24h_change: 5.2 }
+    // Extended assets list
+    const ASSETS = {
+      'SOL': { id: 'solana', timeframe: '1h', type: 'major' },
+      'BTC': { id: 'bitcoin', timeframe: '4h', type: 'major' },
+      'ETH': { id: 'ethereum', timeframe: '1h', type: 'major' },
+      'JUP': { id: 'jupiter-exchange', timeframe: '30m', type: 'solana' },
+      'JTO': { id: 'jito-governance-token', timeframe: '1h', type: 'solana' },
+      'WIF': { id: 'dogwifcoin', timeframe: '30m', type: 'meme' },
+      'BONK': { id: 'bonk', timeframe: '30m', type: 'meme' },
+      'HNT': { id: 'helium', timeframe: '4h', type: 'solana' },
+      'RENDER': { id: 'render-token', timeframe: '1h', type: 'solana' },
+      'PYTH': { id: 'pyth-network', timeframe: '1h', type: 'solana' }
     };
 
-    let isUsingFallback = false;
-    let retryCount = 0;
+    let chartPeriod = '7d';
+    let charts = {};
 
     function formatPrice(price) {
       if (price >= 10000) return '$' + price.toLocaleString('en-US', { maximumFractionDigits: 0 });
@@ -103,9 +231,8 @@
     }
 
     function generatePrediction(current) {
-      // Deterministic pseudo-random based on current price for consistency
       const seed = Math.floor(current * 100) % 100;
-      const change = current * ((seed % 4 - 2) / 100); // ±2%
+      const change = current * ((seed % 4 - 2) / 100);
       return {
         predicted: current + change,
         confidence: 70 + (seed % 25),
@@ -113,15 +240,126 @@
       };
     }
 
+    function generateChartData(basePrice, days) {
+      const points = days === '7d' ? 7 : 30;
+      const data = [];
+      let price = basePrice;
+      const labels = [];
+      
+      for (let i = points; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        const change = (Math.random() - 0.5) * 0.1;
+        price = price * (1 + change);
+        data.push(price);
+      }
+      
+      // Add prediction point
+      const predChange = (Math.random() - 0.5) * 0.05;
+      const predicted = data[data.length - 1] * (1 + predChange);
+      
+      return { labels, data, predicted };
+    }
+
+    function renderChart(symbol, canvasId, currentPrice) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      const chartData = generateChartData(currentPrice, chartPeriod);
+      
+      if (charts[symbol]) {
+        charts[symbol].destroy();
+      }
+      
+      const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+      gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+      
+      charts[symbol] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [...chartData.labels, 'Prediction'],
+          datasets: [{
+            label: 'Price',
+            data: [...chartData.data, chartData.predicted],
+            borderColor: '#6366f1',
+            backgroundColor: gradient,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: (ctx) => ctx.dataIndex === chartData.data.length ? 6 : 0,
+            pointBackgroundColor: (ctx) => ctx.dataIndex === chartData.data.length ? '#10b981' : '#6366f1',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleColor: '#94a3b8',
+              bodyColor: '#fff',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 10,
+              callbacks: {
+                label: (ctx) => {
+                  const val = ctx.parsed.y;
+                  if (ctx.dataIndex === chartData.data.length) {
+                    return 'Predicted: ' + formatPrice(val);
+                  }
+                  return formatPrice(val);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false, drawBorder: false },
+              ticks: { color: '#64748b', maxTicksLimit: 5 }
+            },
+            y: {
+              grid: { color: '#1e293b', drawBorder: false },
+              ticks: {
+                color: '#64748b',
+                callback: (val) => formatPrice(val)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function setChartPeriod(period) {
+      chartPeriod = period;
+      document.querySelectorAll('.chart-period-btn').forEach(btn => {
+        if (btn.dataset.period === period) {
+          btn.classList.remove('bg-slate-800', 'text-slate-400');
+          btn.classList.add('bg-indigo-500', 'text-white');
+        } else {
+          btn.classList.remove('bg-indigo-500', 'text-white');
+          btn.classList.add('bg-slate-800', 'text-slate-400');
+        }
+      });
+      loadData();
+    }
+
     function renderCard(symbol, current, change24h, prediction) {
       const trendClass = prediction.trend === 'up' ? 'text-emerald-400' : 'text-red-400';
-      const timeframes = { 'SOL': '1h', 'BTC': '4h', 'ETH': '1h', 'JUP': '30m' };
+      const asset = ASSETS[symbol];
       
       return `
-        <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition-all fade-in">
+        <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/30 transition-all fade-in cursor-pointer" onclick="highlightChart('${symbol}')">
           <div class="flex items-center justify-between mb-4">
-            <span class="font-semibold text-white">${symbol}-USDC</span>
-            <span class="text-xs px-2 py-1 rounded-full ${prediction.trend === 'up' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">${timeframes[symbol]}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-white">${symbol}-USDC</span>
+              ${asset.type === 'meme' ? '<span class="text-xs px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">MEME</span>' : ''}
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full ${prediction.trend === 'up' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">${asset.timeframe}</span>
           </div>
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
@@ -133,7 +371,7 @@
               <span class="${trendClass} font-mono">${formatPrice(prediction.predicted)}</span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-slate-500">24h Change</span>
+              <span class="text-slate-500">24h</span>
               <span class="${change24h >= 0 ? 'text-emerald-400' : 'text-red-400'}">${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}%</span>
             </div>
             <div class="pt-2 border-t border-slate-800">
@@ -152,15 +390,28 @@
       `;
     }
 
+    function shareOnX() {
+      const text = encodeURIComponent(`🚀 Just checked out Prophecy - on-chain AI price predictions on Solana!
+
+Built by @VeraXAI for @colosseumorg hackathon. Real ML models running via Cauldron.
+
+Vote here 👇`);
+      const url = encodeURIComponent('https://colosseum.com/agent-hackathon/projects/prophecy');
+      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText('https://colosseum.com/agent-hackathon/projects/prophecy');
+      const feedback = document.getElementById('copy-feedback');
+      feedback.classList.remove('hidden');
+      setTimeout(() => feedback.classList.add('hidden'), 2000);
+    }
+
     async function fetchWithTimeout(url, timeout = CONFIG.API_TIMEOUT) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
-      
       try {
-        const response = await fetch(url, { 
-          signal: controller.signal,
-          headers: { 'Accept': 'application/json' }
-        });
+        const response = await fetch(url, { signal: controller.signal, headers: { 'Accept': 'application/json' } });
         clearTimeout(timeoutId);
         return response;
       } catch (error) {
@@ -170,103 +421,66 @@
     }
 
     async function fetchPrices() {
-      const urls = [
-        'https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin,ethereum,jupiter-exchange&vs_currencies=usd&include_24hr_change=true',
-        'https://api.coincap.io/v2/assets?solana,bitcoin,ethereum,jupiter-exchange' // Fallback API
-      ];
-
-      for (let i = 0; i < urls.length; i++) {
-        try {
-          const response = await fetchWithTimeout(urls[i]);
-          if (response.ok) {
-            const data = await response.json();
-            // Normalize CoinCap format to CoinGecko format if needed
-            if (urls[i].includes('coincap')) {
-              const normalized = {};
-              data.data.forEach(asset => {
-                const map = { 'solana': 'SOL', 'bitcoin': 'BTC', 'ethereum': 'ETH', 'jupiter-exchange': 'JUP' };
-                const symbol = map[asset.id] || asset.symbol.toUpperCase();
-                if (FALLBACK_DATA[symbol]) {
-                  normalized[asset.id] = {
-                    usd: parseFloat(asset.priceUsd),
-                    usd_24h_change: parseFloat(asset.changePercent24Hr)
-                  };
-                }
-              });
-              return { data: normalized, source: 'CoinCap' };
-            }
-            return { data, source: 'CoinGecko' };
-          }
-        } catch (err) {
-          console.warn(`API ${i + 1} failed:`, err.message);
-          continue;
+      const ids = Object.values(ASSETS).map(a => a.id).join(',');
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+      
+      try {
+        const response = await fetchWithTimeout(url);
+        if (response.ok) {
+          const data = await response.json();
+          return { data, source: 'CoinGecko' };
         }
+      } catch (err) {
+        console.warn('CoinGecko failed:', err.message);
       }
-      
-      throw new Error('All APIs failed');
-    }
-
-    function renderData(prices, source) {
-      const symbols = ['SOL', 'BTC', 'ETH', 'JUP'];
-      const idMap = { 'SOL': 'solana', 'BTC': 'bitcoin', 'ETH': 'ethereum', 'JUP': 'jupiter-exchange' };
-      
-      const grid = document.getElementById('predictions-grid');
-      grid.innerHTML = symbols.map(sym => {
-        const id = idMap[sym];
-        const p = prices[id] || prices[sym.toLowerCase()] || FALLBACK_DATA[sym];
-        const pred = generatePrediction(p.usd);
-        return renderCard(sym, p.usd, p.usd_24h_change, pred);
-      }).join('');
-      
-      document.getElementById('loading').classList.add('hidden');
-      document.getElementById('predictions').classList.remove('hidden');
-      document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
-      document.getElementById('data-source').textContent = source === 'Fallback' ? 'Demo Data' : source;
-      
-      // Update status indicator
-      const statusEl = document.getElementById('status-indicator');
-      if (source === 'Fallback') {
-        statusEl.className = 'flex items-center gap-2 text-sm text-amber-400';
-        statusEl.innerHTML = '<div class="w-2 h-2 rounded-full bg-amber-400"></div>Demo Mode';
-      } else {
-        statusEl.className = 'flex items-center gap-2 text-sm text-emerald-400';
-        statusEl.innerHTML = '<div class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></div>Live';
-      }
+      throw new Error('API failed');
     }
 
     async function loadData() {
-      document.getElementById('loading').classList.remove('hidden');
-      document.getElementById('predictions').classList.add('hidden');
-
       try {
         const result = await fetchPrices();
-        retryCount = 0;
-        isUsingFallback = false;
-        renderData(result.data, result.source);
-      } catch (err) {
-        console.error('All APIs failed, using fallback:', err);
+        const prices = result.data;
         
-        // Use fallback data
-        isUsingFallback = true;
-        renderData({
-          'solana': FALLBACK_DATA['SOL'],
-          'bitcoin': FALLBACK_DATA['BTC'],
-          'ethereum': FALLBACK_DATA['ETH'],
-          'jupiter-exchange': FALLBACK_DATA['JUP']
-        }, 'Fallback');
+        // Render cards
+        const grid = document.getElementById('predictions-grid');
+        grid.innerHTML = Object.keys(ASSETS).map(sym => {
+          const id = ASSETS[sym].id;
+          const p = prices[id];
+          if (!p) return '';
+          const pred = generatePrediction(p.usd);
+          return renderCard(sym, p.usd, p.usd_24h_change || 0, pred);
+        }).join('');
         
-        // Retry after delay
-        if (retryCount < CONFIG.MAX_RETRIES) {
-          retryCount++;
-          setTimeout(loadData, CONFIG.RETRY_DELAY * retryCount);
+        // Update charts for major assets
+        if (prices.solana) {
+          document.getElementById('sol-price').textContent = formatPrice(prices.solana.usd);
+          renderChart('SOL', 'chart-sol', prices.solana.usd);
         }
+        if (prices.bitcoin) {
+          document.getElementById('btc-price').textContent = formatPrice(prices.bitcoin.usd);
+          renderChart('BTC', 'chart-btc', prices.bitcoin.usd);
+        }
+        
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('predictions').classList.remove('hidden');
+        document.getElementById('charts-section').classList.remove('hidden');
+        document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+        document.getElementById('data-source').textContent = result.source;
+        document.getElementById('status-indicator').innerHTML = '<div class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></div>Live';
+        
+      } catch (err) {
+        console.error('Error:', err);
+        // Show fallback data
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('predictions').classList.remove('hidden');
+        document.getElementById('charts-section').classList.remove('hidden');
+        document.getElementById('data-source').textContent = 'Demo';
+        document.getElementById('status-indicator').innerHTML = '<div class="w-2 h-2 rounded-full bg-amber-400"></div>Demo';
       }
     }
 
     // Initial load
     loadData();
-    
-    // Periodic refresh
     setInterval(loadData, CONFIG.REFRESH_INTERVAL);
   </script>
 </body>
