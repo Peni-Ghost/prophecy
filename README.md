@@ -10,7 +10,9 @@ Prophecy is an on-chain ML inference system built on Solana using Cauldron. It t
 
 ## 🌐 Live Demo
 
-**Web App:** https://prophecy-seven.vercel.app/
+**Web App:** https://prophecy-m2rd477ec-peni-ghosts-projects.vercel.app/
+
+*(Previous: https://prophecy-seven.vercel.app/)*
 
 **Telegram Bot:** [@ProphecyOracleBot](https://t.me/ProphecyOracleBot)
 
