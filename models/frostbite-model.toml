@@ -1,0 +1,25 @@
+# Frostbite Model Configuration
+# Price Prediction MLP
+
+[model]
+template = "mlp_small"
+name = "price-predictor"
+version = "0.1.0"
+
+[input]
+shape = [10]  # 10 time steps of price data
+
+[output]
+shape = [1]   # Predict next price
+
+[vm]
+# Deterministic seed for account derivation
+seed = "prophecy-price-oracle-v1"
+ram_count = 2
+
+[guest]
+entry = "predict"
+
+[weights]
+# Format: binary packed weights
+file = "weights.bin"
