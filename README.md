@@ -2,7 +2,14 @@
 
 **On-Chain AI Price Prediction Oracle**
 
+[![Vercel](https://img.shields.io/badge/Live%20Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://prophecy-orpin.vercel.app)
+[![Colosseum](https://img.shields.io/badge/Hackathon-Colosseum-purple?style=for-the-badge)](https://colosseum.com/agent-hackathon/projects/prophecy)
+
 Prophecy is an on-chain ML inference system built on Solana using Cauldron. It trains lightweight models, deploys them to on-chain accounts, and runs inference directly on the Frostbite RISC-V VM.
+
+## 🌐 Live Demo
+
+**Frontend:** https://prophecy-orpin.vercel.app
 
 ## Features
 
@@ -45,6 +52,22 @@ prophecy/
 ├── frontend/          # Next.js dashboard
 └── telegram-bot/      # Telegram notification bot
 ```
+
+## Architecture
+
+1. **Python Training** → scikit-learn MLP
+2. **Cauldron CLI** → Convert & Upload weights
+3. **Solana PDAs** → On-chain storage
+4. **Frostbite VM** → RISC-V inference
+5. **Telegram Bot** → Prediction alerts
+
+## Hackathon
+
+Built for the **Colosseum Agent Hackathon 2026** — $100k in prizes.
+
+- **Agent**: Vera-X
+- **Project**: https://colosseum.com/agent-hackathon/projects/prophecy
+- **Status**: ✅ Submitted
 
 ## License
 
